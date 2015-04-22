@@ -17,7 +17,7 @@ function level1Start()
   endTimer = 3
   for i = 1, 5, 1 do
     newEnemy = enemyCreateNew(1)
-		table.insert(enemyStack, newEnemy)
+    table.insert(enemyStack, newEnemy)
   end
 end
 

@@ -26,7 +26,7 @@ end
 
 function love.load(arg)
   --loading assets
-	allShips = love.graphics.newImage('assets/ships/shipsall.gif')
+  allShips = love.graphics.newImage('assets/ships/shipsall.gif')
   player.width = 57
   player.height = 61
   player.quad = love.graphics.newQuad(68, 124, player.width, player.height, allShips:getWidth(), allShips:getHeight())
@@ -98,28 +98,28 @@ end
 function love.draw(dt)
 
   if gamestate == "ingame" or gamestate == "pause" then
-  	love.graphics.print("Score:"..score, 10, love.graphics:getHeight()-30)
+    love.graphics.print("Score:"..score, 10, love.graphics:getHeight()-30)
 
-  	if isAlive then
+    if isAlive then
       --drawing player
-  		love.graphics.draw(allShips, player.quad, player.x, player.y)
-  	else
+      love.graphics.draw(allShips, player.quad, player.x, player.y)
+    else
       --drawing message on death
       local message1 = "Press 'R' to restart"
       local message2 = "or press 'Esc' to go to menu"
-  		love.graphics.print(message1, love.graphics:getWidth()/2-(font:getWidth(message1)/2), love.graphics:getHeight()/2-10)
+      love.graphics.print(message1, love.graphics:getWidth()/2-(font:getWidth(message1)/2), love.graphics:getHeight()/2-10)
       love.graphics.print(message2, love.graphics:getWidth()/2-(font:getWidth(message2)/2), love.graphics:getHeight()/2+10)
-  	end
+    end
 
     --drawing bullets
-  	for i, bullet in ipairs(bullets) do
-  	  love.graphics.draw(bullet.img, bullet.x, bullet.y)
-  	end
+    for i, bullet in ipairs(bullets) do
+      love.graphics.draw(bullet.img, bullet.x, bullet.y)
+    end
 
     --drawing enemies
-  	for i, enemy in ipairs(enemies) do
+    for i, enemy in ipairs(enemies) do
       love.graphics.draw(allShips, enemy.quad, enemy.x, enemy.y, math.pi, 1, 1, enemy.width, enemy.height)
-  	end
+    end
 
     --drawing player health bar
     love.graphics.setColor(250,0,0,150)

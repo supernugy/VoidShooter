@@ -81,10 +81,10 @@ end
 
 -- Time out how far apart our shots can be.
 function gameChangeTimers(dt)
-	canShootTimer = canShootTimer - (1 * dt)
-	if canShootTimer < 0 then
-	  canShoot = true
-	end
+  canShootTimer = canShootTimer - (1 * dt)
+  if canShootTimer < 0 then
+    canShoot = true
+  end
 end
 
 -- spawn new enemy
@@ -97,8 +97,8 @@ end
 
 -- update the positions of enemies and shooting
 function gameUpdateEnemy(dt)
-	for i, enemy in ipairs(enemies) do
-		enemy.y = enemy.y + (enemy.enemySpeed * dt)
+  for i, enemy in ipairs(enemies) do
+    enemy.y = enemy.y + (enemy.enemySpeed * dt)
 
     enemy.enemyShootTimer = enemy.enemyShootTimer - 1*dt
 
@@ -107,28 +107,28 @@ function gameUpdateEnemy(dt)
       local x = enemy.x + (enemy.width/2) - 3
       local y = enemy.y + enemy.height
       local newBullet = gameCreateBullet(x, y, "enemy", enemy.bulletDamage, enemy.bulletSpeed, bulletEnemyImg)
-  		table.insert(bullets, newBullet)
+      table.insert(bullets, newBullet)
       local soundClone = shootSound:clone()
       soundClone:play()
       enemy.enemyShootTimer = enemy.defaultEnemyShootTimer
     end
 
     -- remove enemies when they pass off the screen
-		if enemy.y > 1000 then
-			table.remove(enemies, i)
-		end
-	end
+    if enemy.y > 1000 then
+      table.remove(enemies, i)
+    end
+  end
 end
 
 -- run our collision detection
 -- Since there will be fewer enemies on screen than bullets we'll loop them first
 -- Also, we need to see if the enemies hit our player
 function gameCollisionWithEnemy(dt)
-	for i, enemy in ipairs(enemies) do
-		for j, bullet in ipairs(bullets) do
+  for i, enemy in ipairs(enemies) do
+    for j, bullet in ipairs(bullets) do
 
       -- checking collision of enemy and player bullet
-			if CheckCollision(enemy.x, enemy.y, enemy.width, enemy.height, bullet.x, bullet.y, bullet.img:getWidth(), bullet.img:getHeight())
+      if CheckCollision(enemy.x, enemy.y, enemy.width, enemy.height, bullet.x, bullet.y, bullet.img:getWidth(), bullet.img:getHeight())
       and bullet.type == "player" then
         local bulletDmg = bullet.damage
 
@@ -137,20 +137,20 @@ function gameCollisionWithEnemy(dt)
         table.remove(bullets, j)
 
         if enemy.hp <= 0 then
-  				table.remove(enemies, i)
-  				score = score + 1
+          table.remove(enemies, i)
+          score = score + 1
           local explosionSoundClone = explosionSound:clone()
           explosionSoundClone:play()
         else
           local hitSoundClone = hitSound:clone()
           hitSoundClone:play()
         end
-			end
-		end
+      end
+    end
 
     -- checking player collision with enemy
-		if CheckCollision(enemy.x, enemy.y, enemy.width, enemy.height, player.x, player.y, player.width, player.height)
-		and isAlive then
+    if CheckCollision(enemy.x, enemy.y, enemy.width, enemy.height, player.x, player.y, player.width, player.height)
+    and isAlive then
       local enemyDmg = enemy.damage
 
       --resolving shields first
@@ -174,14 +174,14 @@ function gameCollisionWithEnemy(dt)
 
       if player.hp <= 0 then
         player.hp = 0
-  			isAlive = false
+        isAlive = false
         explosionSoundClone:play()
       end
 
       table.remove(enemies, i)
       explosionSoundClone:play()
-		end
-	end
+    end
+  end
 end
 
 
@@ -215,7 +215,7 @@ function gameCollisionWithBullets(dt)
 
       if player.hp <= 0 then
         player.hp = 0
-  			isAlive = false
+        isAlive = false
         local explosionSoundClone = explosionSound:clone()
         explosionSoundClone:play()
       end
@@ -231,41 +231,41 @@ function gameMovePlayer(dt)
   if isAlive then
     if love.keyboard.isDown('left','a') and love.keyboard.isDown('up','w') then
       if player.x > 0 then -- binds us to the map
-  			player.x = player.x - (player.speed*dt)
-  		end
+        player.x = player.x - (player.speed*dt)
+      end
       if player.y > 0 then
         player.y = player.y - (player.speed*dt)
       end
     elseif love.keyboard.isDown('left','a') and love.keyboard.isDown('down','s') then
       if player.x > 0 then -- binds us to the map
-  			player.x = player.x - (player.speed*dt)
-  		end
+        player.x = player.x - (player.speed*dt)
+      end
       if player.y < (love.graphics.getHeight() - player.height) then
         player.y = player.y + (player.speed*dt)
       end
     elseif love.keyboard.isDown('right','d') and love.keyboard.isDown('up','w') then
       if player.x < (love.graphics.getWidth() - player.width) then
-  			player.x = player.x + (player.speed*dt)
-  		end
+        player.x = player.x + (player.speed*dt)
+      end
       if player.y > 0 then
         player.y = player.y - (player.speed*dt)
       end
     elseif love.keyboard.isDown('right','d') and love.keyboard.isDown('down','s') then
       if player.x < (love.graphics.getWidth() - player.width) then
-  			player.x = player.x + (player.speed*dt)
-  		end
+        player.x = player.x + (player.speed*dt)
+      end
       if player.y < (love.graphics.getHeight() - player.height) then
         player.y = player.y + (player.speed*dt)
       end
-  	elseif love.keyboard.isDown('left','a') then
-  		if player.x > 0 then -- binds us to the map
-  			player.x = player.x - (player.speed*dt)
-  		end
-  	elseif love.keyboard.isDown('right','d') then
-  		if player.x < (love.graphics.getWidth() - player.width) then
-  			player.x = player.x + (player.speed*dt)
-  		end
-  	elseif love.keyboard.isDown('up','w') then
+    elseif love.keyboard.isDown('left','a') then
+      if player.x > 0 then -- binds us to the map
+        player.x = player.x - (player.speed*dt)
+      end
+    elseif love.keyboard.isDown('right','d') then
+      if player.x < (love.graphics.getWidth() - player.width) then
+        player.x = player.x + (player.speed*dt)
+      end
+    elseif love.keyboard.isDown('up','w') then
       if player.y > 0 then
         player.y = player.y - (player.speed*dt)
       end
@@ -279,17 +279,17 @@ end
 
 -- Shooting
 function gamePlayerShoot(dt)
-	if love.keyboard.isDown(' ', 'rctrl', 'lctrl', 'ctrl') and canShoot and isAlive then
-		-- Create some bullets
+  if love.keyboard.isDown(' ', 'rctrl', 'lctrl', 'ctrl') and canShoot and isAlive then
+    -- Create some bullets
     local x = player.x + (player.width/2) - 3
     local y = player.y
     local newBullet = gameCreateBullet(x, y, "player", 20, 400, bulletPlayerImg)
-		table.insert(bullets, newBullet)
+    table.insert(bullets, newBullet)
     local soundClone = shootSound:clone()
     soundClone:play()
-		canShoot = false
-		canShootTimer = canShootTimerMax
-	end
+    canShoot = false
+    canShootTimer = canShootTimerMax
+  end
 end
 
 
@@ -312,10 +312,10 @@ end
 -- game reset after death
 function gameReset()
   if not isAlive and love.keyboard.isDown('r') then
-		resetVariables()
+    resetVariables()
     levelStart(currentLevel)
     score = 0
-	elseif not isAlive and love.keyboard.isDown('escape') then
+  elseif not isAlive and love.keyboard.isDown('escape') then
     gamestate = "menu"
   end
 end
