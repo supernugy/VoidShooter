@@ -15,7 +15,8 @@ bulletPlayerImg = nil
 bulletEnemyImg = nil
 
 -- Entity Storage
-bullets = {} -- array of current bullets being drawn and updated
+playerBullets = {}
+enemyBullets = {} -- array of current bullets being drawn and updated
 
 -- array of current enemies on screen
 enemies = {}
@@ -59,24 +60,30 @@ end
 
 -- update the positions of bullets
 function gameUpdateBullets(dt)
-  for i, bullet in ipairs(bullets) do
+  for i, bullet in ipairs(playerBullets) do
+
     if bullet.type == "player" then
       bullet.y = bullet.y - (bullet.speed * dt)
 
       -- remove bullets when they pass off the screen
       if bullet.y < 0 then
-        table.remove(bullets, i)
+        table.remove(playerBullets, i)
       end
+    end
 
-    elseif bullet.type == "enemy" then
+  end
+
+  for i, bullet in ipairs(enemyBullets) do
+
+    if bullet.type == "enemy" then
       bullet.y = bullet.y + (bullet.speed * dt)
 
       -- remove bullets when they pass off the screen
       if bullet.y > love.graphics.getHeight() then
-        table.remove(bullets, i)
+        table.remove(enemyBullets, i)
       end
-
     end
+
   end
 end
 
@@ -109,7 +116,7 @@ function gameUpdateEnemy(dt)
       local x = enemy.x + (enemy.width/2) - 3
       local y = enemy.y + enemy.height
       local newBullet = gameCreateBullet(x, y, "enemy", enemy.bulletDamage, enemy.bulletSpeed, bulletEnemyImg)
-      table.insert(bullets, newBullet)
+      table.insert(enemyBullets, newBullet)
       local soundClone = shootSound:clone()
       soundClone:play()
       enemy.enemyShootTimer = enemy.defaultEnemyShootTimer
@@ -127,7 +134,7 @@ end
 -- Also, we need to see if the enemies hit our player
 function gameCollisionWithEnemy(dt)
   for i, enemy in ipairs(enemies) do
-    for j, bullet in ipairs(bullets) do
+    for j, bullet in ipairs(playerBullets) do
 
       -- checking collision of enemy and player bullet
       if CheckCollision(enemy.x, enemy.y, enemy.width, enemy.height, bullet.x, bullet.y + bullet.img:getHeight()/2, bullet.img:getWidth(), bullet.img:getHeight())
@@ -136,7 +143,7 @@ function gameCollisionWithEnemy(dt)
 
         -- resolving enemy hp
         enemy.hp = enemy.hp - bulletDmg
-        table.remove(bullets, j)
+        table.remove(playerBullets, j)
 
         if enemy.hp <= 0 then
           table.remove(enemies, i)
@@ -189,7 +196,7 @@ end
 
 -- checking collisions with bullets
 function gameCollisionWithBullets(dt)
-  for i, bullet in ipairs(bullets) do
+  for i, bullet in ipairs(enemyBullets) do
 
     -- checking player collision with bullets
     if CheckCollision(bullet.x, bullet.y - bullet.img:getHeight()/2, bullet.img:getWidth(), bullet.img:getHeight(),
@@ -222,7 +229,7 @@ function gameCollisionWithBullets(dt)
         explosionSoundClone:play()
       end
 
-      table.remove(bullets, i)
+      table.remove(enemyBullets, i)
     end
   end
 end
@@ -286,7 +293,7 @@ function gamePlayerShoot(dt)
     local x = player.x + (player.width/2) - 3
     local y = player.y
     local newBullet = gameCreateBullet(x, y, "player", 20, 400, bulletPlayerImg)
-    table.insert(bullets, newBullet)
+    table.insert(playerBullets, newBullet)
     local soundClone = shootSound:clone()
     soundClone:play()
     canShoot = false
@@ -325,7 +332,8 @@ end
 -- reseting game variable
 function resetVariables()
   -- remove all our bullets and enemies from screen
-  bullets = {}
+  enemyBullets = {}
+  playerBullets = {}
   enemies = {}
 
   -- reset timers

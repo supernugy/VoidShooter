@@ -98,6 +98,8 @@ end
 function love.draw(dt)
 
   if gamestate == "ingame" or gamestate == "pause" then
+    love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+
     love.graphics.print("Score:"..score, 10, love.graphics:getHeight()-30)
 
     if isAlive then
@@ -111,8 +113,13 @@ function love.draw(dt)
       love.graphics.print(message2, love.graphics:getWidth()/2-(font:getWidth(message2)/2), love.graphics:getHeight()/2+10)
     end
 
-    --drawing bullets
-    for i, bullet in ipairs(bullets) do
+    --drawing player bullets
+    for i, bullet in ipairs(playerBullets) do
+      love.graphics.draw(bullet.img, bullet.x, bullet.y)
+    end
+
+    --drawing enemy bullets
+    for i, bullet in ipairs(enemyBullets) do
       love.graphics.draw(bullet.img, bullet.x, bullet.y)
     end
 
