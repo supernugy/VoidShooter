@@ -67,6 +67,7 @@ function gameUpdateBullets(dt)
       if bullet.y < 0 then
         table.remove(bullets, i)
       end
+
     elseif bullet.type == "enemy" then
       bullet.y = bullet.y + (bullet.speed * dt)
 
@@ -74,6 +75,7 @@ function gameUpdateBullets(dt)
       if bullet.y > love.graphics.getHeight() then
         table.remove(bullets, i)
       end
+
     end
   end
 end
@@ -114,7 +116,7 @@ function gameUpdateEnemy(dt)
     end
 
     -- remove enemies when they pass off the screen
-    if enemy.y > 1000 then
+    if enemy.y > love.graphics.getHeight() then
       table.remove(enemies, i)
     end
   end
@@ -128,7 +130,7 @@ function gameCollisionWithEnemy(dt)
     for j, bullet in ipairs(bullets) do
 
       -- checking collision of enemy and player bullet
-      if CheckCollision(enemy.x, enemy.y, enemy.width, enemy.height, bullet.x, bullet.y, bullet.img:getWidth(), bullet.img:getHeight())
+      if CheckCollision(enemy.x, enemy.y, enemy.width, enemy.height, bullet.x, bullet.y + bullet.img:getHeight()/2, bullet.img:getWidth(), bullet.img:getHeight())
       and bullet.type == "player" then
         local bulletDmg = bullet.damage
 
@@ -190,7 +192,7 @@ function gameCollisionWithBullets(dt)
   for i, bullet in ipairs(bullets) do
 
     -- checking player collision with bullets
-    if CheckCollision(bullet.x, bullet.y, bullet.img:getWidth(), bullet.img:getHeight(),
+    if CheckCollision(bullet.x, bullet.y - bullet.img:getHeight()/2, bullet.img:getWidth(), bullet.img:getHeight(),
     player.x, player.y, player.width, player.height) and bullet.type == "enemy"
     and isAlive then
 
@@ -330,8 +332,8 @@ function resetVariables()
   canShootTimer = canShootTimerMax
 
   -- move player back to default position
-  player.x = 350
-  player.y = 900
+  player.x = love.graphics.getWidth()/2
+  player.y = love.graphics.getHeight() - player.height - 10
   player.speed = playerSpeedDefault
   player.hp = playerHpDefault
   player.shield = playerShieldDefault
