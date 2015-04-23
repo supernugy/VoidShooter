@@ -7,7 +7,8 @@ require "game"
 require "enemy"
 
 boss = nil
-enemyLaunchTimer = 2
+spawnPoints = {}
+spawnIndex = 0
 endTimer = nil
 
 --start level by creating enemies and changing gamestates
@@ -15,8 +16,20 @@ function level2Start()
   gamestate = "levelbegin"
   currentLevel = 2
   endTimer = 3
-  for i = 1, 10, 1 do
-    newEnemy = enemyCreateNew(1)
+
+  local numberOfEnemies = 10
+
+  local spawnArrayX = {0,0,0,0,0,0,0,0,0,0}
+  local spawnArrayTimers = {2,3,3,3,3,3,3,3,3,3}
+  spawnIndex = 1
+
+  spawnPoints = gameGenerateSpawnPoints(spawnArrayX, spawnArrayTimers)
+  if table.getn(spawnPoints) < numberOfEnemies then
+    numberOfEnemies = table.getn(spawnPoints)
+  end
+
+  for i = 1, numberOfEnemies, 1 do
+    newEnemy = enemyCreateNew(2)
     table.insert(enemyStack, newEnemy)
   end
 end
@@ -25,15 +38,17 @@ end
 function level2Update(dt)
 
   --decrease and check enemy spawn timer - spawn enemy if < 0
-  enemyLaunchTimer = enemyLaunchTimer - 1*dt
-  if enemyLaunchTimer <= 0 and table.getn(enemyStack) > 0 then
-    enemyLaunchTimer = 2
+  spawnPoints[spawnIndex].timer = spawnPoints[spawnIndex].timer - 1*dt
+  if spawnPoints[spawnIndex].timer <= 0 and table.getn(enemyStack) > 0 then
     local size = table.getn(enemyStack)
+    local x = spawnPoints[spawnIndex].x
 
-    randomX = math.random(10, love.graphics.getWidth() - 60)
+    if table.getn(spawnPoints) > spawnIndex then
+      spawnIndex = spawnIndex + 1
+    end
 
     --spawn new enemy
-    gameLaunchEnemy(randomX, -10, size)
+    gameLaunchEnemy(x, size)
   end
 
   --check for level end conditions

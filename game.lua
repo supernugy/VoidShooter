@@ -87,6 +87,17 @@ function gameUpdateBullets(dt)
   end
 end
 
+-- generates spawn points for given x coordinates and timers array
+function gameGenerateSpawnPoints(arrayX, arrayTimer)
+  local resultSpawnPoints = {}
+
+  for i = 1, table.getn(arrayX), 1 do
+    local spawnPoint = {x = arrayX[i], timer = arrayTimer[i]}
+    table.insert(resultSpawnPoints, spawnPoint)
+  end
+
+  return resultSpawnPoints
+end
 
 -- Time out how far apart our shots can be.
 function gameChangeTimers(dt)
@@ -97,17 +108,34 @@ function gameChangeTimers(dt)
 end
 
 -- spawn new enemy
-function gameLaunchEnemy(x, y, i)
+function gameLaunchEnemy(x, i)
   local stackedEnemy = table.remove(enemyStack, i)
   stackedEnemy.x = x
-  stackedEnemy.y = y
+  stackedEnemy.y = -stackedEnemy.height
   table.insert(enemies, stackedEnemy)
 end
 
 -- update the positions of enemies and shooting
 function gameUpdateEnemy(dt)
   for i, enemy in ipairs(enemies) do
-    enemy.y = enemy.y + (enemy.enemySpeed * dt)
+
+    local moveIndex = enemy.currentMoveIndex
+    local moveTimer = enemy.movePattern.time[moveIndex]
+    local moveSpeedX = enemy.movePattern.speedX[moveIndex]
+    local moveSpeedY = enemy.movePattern.speedY[moveIndex]
+
+    enemy.movePattern.time[moveIndex] = moveTimer - 1*dt
+
+    if enemy.movePattern.time[moveIndex] <= 0 then
+      if(table.getn(enemy.movePattern.time) > moveIndex) then
+        enemy.currentMoveIndex = enemy.currentMoveIndex + 1
+      else
+        enemy.movePattern.time[moveIndex] = 100
+      end
+    end
+
+    enemy.y = enemy.y + (moveSpeedY * dt)
+    enemy.x = enemy.x + (moveSpeedX * dt)
 
     enemy.enemyShootTimer = enemy.enemyShootTimer - 1*dt
 
