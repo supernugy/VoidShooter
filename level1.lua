@@ -15,8 +15,8 @@ function level1Start()
   gamestate = "levelbegin"
   currentLevel = 1
   endTimer = 3
-  for i = 1, 5, 1 do
-    newEnemy = enemyCreateNew(1)
+  for i = 1, 10, 1 do
+    newEnemy = enemyCreateNew(2)
     table.insert(enemyStack, newEnemy)
   end
 end

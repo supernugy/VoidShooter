@@ -8,5 +8,5 @@ function love.conf(t)
   t.version = "0.9.2"
   t.window.width = 700
   t.window.height = 1000
-  t.console = true
+  --t.console = true
 end

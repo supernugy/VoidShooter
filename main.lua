@@ -7,7 +7,7 @@ require "menu"
 require "game"
 require "levelLauncher"
 
-debug = true
+--debug = true
 
 --gamestates
 gamestate = nil
