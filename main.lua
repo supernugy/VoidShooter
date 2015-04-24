@@ -98,7 +98,7 @@ end
 function love.draw(dt)
 
   if gamestate == "ingame" or gamestate == "pause" then
-    love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+    love.graphics.print("FPS: "..tostring(love.timer.getFPS( )), 10, 10)
 
     love.graphics.print("Score:"..score, 10, love.graphics:getHeight()-30)
 
@@ -129,12 +129,14 @@ function love.draw(dt)
     end
 
     --drawing player health bar
-    love.graphics.setColor(250,0,0,150)
-    love.graphics.rectangle("fill", 20, love.graphics:getHeight()-60, 10, -(player.hp*2) )
+    love.graphics.setColor(250,0,0,120)
+    local barHeight = (player.hp/playerHpDefault)*200
+    love.graphics.rectangle("fill", 10, love.graphics:getHeight()-60, 10, -barHeight )
 
     --drawing player shiled bar
-    love.graphics.setColor(0,0,250,150)
-    love.graphics.rectangle("fill", 50, love.graphics:getHeight()-60, 10, -(player.shield*2) )
+    love.graphics.setColor(0,0,250,120)
+    barHeight = (player.shield/playerShieldDefault)*200
+    love.graphics.rectangle("fill", 30, love.graphics:getHeight()-60, 10, -barHeight )
     love.graphics.setColor(255,255,255,255)
   elseif gamestate == "menu" then
     menuButtonDraw()

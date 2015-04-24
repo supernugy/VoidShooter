@@ -36,9 +36,9 @@ shootSound = nil
 -- default values
 shieldRegenMultDefault = 15
 shieldTimerRegenDefault = 1.5
-playerHpDefault = 100
-playerShieldDefault = 100
-playerSpeedDefault = 350
+playerHpDefault = 50
+playerShieldDefault = 50
+playerSpeedDefault = 300
 bulletSpeedDefault = 550
 
 -- Collision detection taken function from http://love2d.org/wiki/BoundingBox.lua
