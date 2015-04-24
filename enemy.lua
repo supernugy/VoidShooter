@@ -30,7 +30,9 @@ function enemyCreateNew(typeId)
     width = 24
     height = 23
     enemyQuad = love.graphics.newQuad(7, 67, width, height, allShips:getWidth(), allShips:getHeight())
-    movePattern = {speedX = {love.graphics.getWidth()/2, -love.graphics.getWidth()/3, love.graphics.getWidth()/2, -love.graphics.getWidth()/2, love.graphics.getWidth()/2, 0}, time = {1.9,2.9,1.9,1.9,1.9,10}, speedY = {love.graphics.getHeight()/6,0,love.graphics.getHeight()/6,0,love.graphics.getHeight()/6,200}}
+    movePattern = {speedX = {love.graphics.getWidth()/2, -love.graphics.getWidth()/3, love.graphics.getWidth()/2, -love.graphics.getWidth()/2, love.graphics.getWidth()/2, 0},
+      time = {1.9,2.9,1.9,1.9,1.9,10},
+      speedY = {love.graphics.getHeight()/6,0,love.graphics.getHeight()/6,0,love.graphics.getHeight()/6,200}}
 
     local newEnemy = { x = 0, y = 0, width = width, height = height, hp = hp, quad = enemyQuad, movePattern = movePattern, currentMoveIndex = 1,
     bulletSpeed = bulletSpeed, damage = damage, bulletDamage = bulletDamage, enemyShootTimer = shootTimer, defaultEnemyShootTimer = shootTimer, type = typeId }

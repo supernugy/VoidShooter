@@ -10,6 +10,9 @@ canShoot = true
 canShootTimerMax = 0.5
 canShootTimer = canShootTimerMax
 
+dyingTimer = 0.8
+dyingTimeInterval = nil
+
 -- Image Storage
 bulletPlayerImg = nil
 bulletEnemyImg = nil
@@ -19,6 +22,7 @@ playerBullets = {}
 enemyBullets = {} -- array of current bullets being drawn and updated
 
 powerUps = {}
+playerExplostionImgs = {}
 
 -- array of current enemies on screen
 enemies = {}
@@ -106,6 +110,10 @@ function gameChangeTimers(dt)
   canShootTimer = canShootTimer - (1 * dt)
   if canShootTimer < 0 then
     canShoot = true
+  end
+
+  if dyingTimer > 0 and not isAlive then
+    dyingTimer = dyingTimer - dt
   end
 end
 
@@ -253,10 +261,11 @@ function gameCollisionWithBullets(dt)
       hitSoundClone:play()
 
       if player.hp <= 0 then
+        dyingTimeInterval = dyingTimer/table.getn(playerExplostionImgs)
         player.hp = 0
-        isAlive = false
         local explosionSoundClone = explosionSound:clone()
         explosionSoundClone:play()
+        isAlive = false
       end
 
       table.remove(enemyBullets, i)

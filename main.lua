@@ -36,6 +36,11 @@ function love.load(arg)
   explosionSound = love.audio.newSource('assets/sounds/explosion.wav')
   shootSound = love.audio.newSource('assets/sounds/playerShoot.wav','static')
 
+  table.insert(playerExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_06_0008.png'))
+  table.insert(playerExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_06_0012.png'))
+  table.insert(playerExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_06_0015.png'))
+  table.insert(playerExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_06_0019.png'))
+
   --initializing gamestate
   gamestate = "menu"
 
@@ -109,6 +114,18 @@ function love.draw(dt)
       --drawing message on death
       local message1 = "Press 'R' to restart"
       local message2 = "or press 'Esc' to go to menu"
+
+      if dyingTimer > 0 then
+        local index = math.floor(dyingTimer/dyingTimeInterval)+1
+
+        for i, explImg in ipairs(playerExplostionImgs) do
+          if i == index then
+            love.graphics.draw(explImg,player.x, player.y)
+          end
+        end
+
+      end
+
       love.graphics.print(message1, love.graphics:getWidth()/2-(font:getWidth(message1)/2), love.graphics:getHeight()/2-10)
       love.graphics.print(message2, love.graphics:getWidth()/2-(font:getWidth(message2)/2), love.graphics:getHeight()/2+10)
     end
