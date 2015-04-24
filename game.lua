@@ -18,6 +18,8 @@ bulletEnemyImg = nil
 playerBullets = {}
 enemyBullets = {} -- array of current bullets being drawn and updated
 
+powerUps = {}
+
 -- array of current enemies on screen
 enemies = {}
 
