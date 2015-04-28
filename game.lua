@@ -175,7 +175,7 @@ function gameCollisionWithEnemy(dt)
     for j, bullet in ipairs(playerBullets) do
 
       -- checking collision of enemy and player bullet
-      if CheckCollision(enemy.x, enemy.y, enemy.width, enemy.height, bullet.x, bullet.y + bullet.img:getHeight()/2, bullet.img:getWidth(), bullet.img:getHeight())
+      if CheckCollision(enemy.x + bullet.img:getWidth()/2, enemy.y + bullet.img:getHeight()*0.2, enemy.width - bullet.img:getWidth(), enemy.height - bullet.img:getHeight()*0.6, bullet.x, bullet.y + bullet.img:getHeight()*0.2, bullet.img:getWidth(), bullet.img:getHeight()*0.6)
       and bullet.type == "player" then
         local bulletDmg = bullet.damage
 
@@ -238,7 +238,7 @@ function gameCollisionWithBullets(dt)
 
     -- checking player collision with bullets
     if CheckCollision(bullet.x, bullet.y - bullet.img:getHeight()/2, bullet.img:getWidth(), bullet.img:getHeight(),
-    player.x, player.y, player.width, player.height) and bullet.type == "enemy"
+    player.x  + bullet.img:getWidth()/2, player.y + bullet.img:getHeight()*0.2, player.width - bullet.img:getWidth(), player.height - bullet.img:getHeight()*0.6) and bullet.type == "enemy"
     and isAlive then
 
       local bulletDmg = bullet.damage
