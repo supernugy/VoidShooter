@@ -10,7 +10,9 @@ canShoot = true
 canShootTimerMax = 0.5
 canShootTimer = canShootTimerMax
 
-dyingTimer = 0.8
+playerDyingTimer = nil
+playerDyingTimerDefault = 0.5
+enemyDyingTimerDefault = 0.5
 dyingTimeInterval = nil
 
 -- Image Storage
@@ -23,9 +25,11 @@ enemyBullets = {} -- array of current bullets being drawn and updated
 
 powerUps = {}
 playerExplostionImgs = {}
+enemyExplostionImgs = {}
 
 -- array of current enemies on screen
 enemies = {}
+deadEnemies = {}
 
 -- array of enemies in stack ready to be spawn
 enemyStack = {}
@@ -112,8 +116,15 @@ function gameChangeTimers(dt)
     canShoot = true
   end
 
-  if dyingTimer > 0 and not isAlive then
-    dyingTimer = dyingTimer - dt
+  if playerDyingTimer > 0 and not isAlive then
+    playerDyingTimer = playerDyingTimer - dt
+  end
+
+  for i, dyingEnemy in ipairs(deadEnemies) do
+    dyingEnemy.enemyDyingTimer = dyingEnemy.enemyDyingTimer - dt
+    if(dyingEnemy.enemyDyingTimer <= 0) then
+      table.remove(deadEnemies,i)
+    end
   end
 end
 
@@ -184,7 +195,14 @@ function gameCollisionWithEnemy(dt)
         table.remove(playerBullets, j)
 
         if enemy.hp <= 0 then
+          local enemyDyingTimer = enemyDyingTimerDefault
+          local enemyDyingTimeInterval = enemyDyingTimer/table.getn(enemyExplostionImgs)
+          local explScale = (enemy.width/100)/(enemyExplostionImgs[1]:getWidth()/100)
+          local deadEnemy = {x = enemy.x, y = enemy.y, enemyDyingTimer = enemyDyingTimer, enemyDyingTimeInterval = enemyDyingTimeInterval, explScale = explScale}
+
+          table.insert(deadEnemies, deadEnemy)
           table.remove(enemies, i)
+
           score = score + 1
           local explosionSoundClone = explosionSound:clone()
           explosionSoundClone:play()
@@ -225,6 +243,13 @@ function gameCollisionWithEnemy(dt)
         explosionSoundClone:play()
       end
 
+      local enemyDyingTimer = enemyDyingTimerDefault
+      local enemyDyingTimeInterval = enemyDyingTimer/table.getn(enemyExplostionImgs)
+      local explScale = (enemy.width/100)/(enemyExplostionImgs[1]:getWidth()/100)
+      local deadEnemy = {x = enemy.x, y = enemy.y, enemyDyingTimer = enemyDyingTimer, enemyDyingTimeInterval = enemyDyingTimeInterval, explScale = explScale}
+
+      table.insert(deadEnemies, deadEnemy)
+
       table.remove(enemies, i)
       explosionSoundClone:play()
     end
@@ -261,7 +286,6 @@ function gameCollisionWithBullets(dt)
       hitSoundClone:play()
 
       if player.hp <= 0 then
-        dyingTimeInterval = dyingTimer/table.getn(playerExplostionImgs)
         player.hp = 0
         local explosionSoundClone = explosionSound:clone()
         explosionSoundClone:play()
@@ -374,9 +398,12 @@ function resetVariables()
   enemyBullets = {}
   playerBullets = {}
   enemies = {}
+  deadEnemies = {}
 
   -- reset timers
   canShootTimer = canShootTimerMax
+  playerDyingTimer = playerDyingTimerDefault
+  dyingTimeInterval = playerDyingTimer/table.getn(playerExplostionImgs)
 
   -- move player back to default position
   player.x = love.graphics.getWidth()/2

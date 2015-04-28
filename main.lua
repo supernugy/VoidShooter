@@ -41,6 +41,11 @@ function love.load(arg)
   table.insert(playerExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_06_0015.png'))
   table.insert(playerExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_06_0019.png'))
 
+  table.insert(enemyExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_04_0008.png'))
+  table.insert(enemyExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_04_0012.png'))
+  table.insert(enemyExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_04_0015.png'))
+  table.insert(enemyExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_04_0019.png'))
+
   --initializing gamestate
   gamestate = "menu"
 
@@ -115,12 +120,15 @@ function love.draw(dt)
       local message1 = "Press 'R' to restart"
       local message2 = "or press 'Esc' to go to menu"
 
-      if dyingTimer > 0 then
-        local index = math.floor(dyingTimer/dyingTimeInterval)+1
+      if playerDyingTimer > 0 then
 
-        for i, explImg in ipairs(playerExplostionImgs) do
-          if i == index then
-            love.graphics.draw(explImg,player.x, player.y)
+        if dyingTimeInterval ~= nil then
+          local index = math.floor(playerDyingTimer/dyingTimeInterval)+1
+
+          for i, explImg in ipairs(playerExplostionImgs) do
+            if i == index then
+              love.graphics.draw(explImg,player.x, player.y)
+            end
           end
         end
 
@@ -143,6 +151,17 @@ function love.draw(dt)
     --drawing enemies
     for i, enemy in ipairs(enemies) do
       love.graphics.draw(allShips, enemy.quad, enemy.x, enemy.y, math.pi, 1, 1, enemy.width, enemy.height)
+    end
+
+    for i, dyingEnemy in ipairs(deadEnemies) do
+      local index = math.floor(dyingEnemy.enemyDyingTimer/dyingEnemy.enemyDyingTimeInterval)+1
+
+      for i, explImg in ipairs(enemyExplostionImgs) do
+        if i == index then
+          --love.graphics.draw(explImg,dyingEnemy.x, dyingEnemy.y)
+          love.graphics.draw(explImg,dyingEnemy.x, dyingEnemy.y, 0, dyingEnemy.explScale, explScale, 0, 0)
+        end
+      end
     end
 
     --drawing player health bar
