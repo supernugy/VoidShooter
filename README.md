@@ -12,6 +12,12 @@ Control
 * Movement: `w`,`a`,`s`,`d` or arrows
 * Shoot: `space`, `lctrl`, `rctrl`
 
+----------------
+Running the game
+----------------
+
+How to run a Love 2D game is described here: https://love2d.org/wiki/Getting_Started
+
 -------
 License
 -------
