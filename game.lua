@@ -3,6 +3,8 @@
 --    (See accompanying file LICENSE_1_0.txt or copy at
 --          http://www.boost.org/LICENSE_1_0.txt)
 
+require "powerup"
+
 player = { x = 0, y = 0, width = 0, height = 0, speed = 0, quad = nil, hp = 0, shield = 0, shieldRegenMult = 0, shieldTimerRegen = 0 }
 
 -- player shoot timers
@@ -50,6 +52,15 @@ playerHpDefault = 50
 playerShieldDefault = 50
 playerSpeedDefault = 300
 bulletSpeedDefault = 550
+
+--power up variables
+powerUpCount = 0
+powerUpSpawnChance = 20
+powerUpShieldTimer = 0
+shieldRegenMultPoweredUp = 25
+shieldTimerRegenPoweredUp = 0.5
+powerUpInvincTimer = 0
+
 
 -- Collision detection taken function from http://love2d.org/wiki/BoundingBox.lua
 -- Returns true if two boxes overlap, false if they don't
@@ -126,6 +137,16 @@ function gameChangeTimers(dt)
       table.remove(deadEnemies,i)
     end
   end
+
+  --powerup timers
+  if powerUpShieldTimer > 0 then
+    powerUpShieldTimer = powerUpShieldTimer - dt
+  end
+
+  if powerUpInvincTimer > 0 then
+    powerUpInvincTimer = powerUpInvincTimer - dt
+  end
+
 end
 
 -- spawn new enemy
@@ -178,6 +199,24 @@ function gameUpdateEnemy(dt)
   end
 end
 
+function gameUpdatePowerUps(dt)
+  for i, powerUp in ipairs(powerUps) do
+    powerUp.y = powerUp.y + powerUp.speed*dt
+
+    if CheckCollision(powerUp.x, powerUp.y, powerUp.img:getWidth(), powerUp.img:getHeight(), player.x, player.y, player.width, player.height) then
+      if powerUp.type == 1 then
+        powerUpShieldTimer = powerUpShieldTimer + 10
+      elseif powerUp.type == 2 then
+        powerUpInvincTimer = powerUpInvincTimer + 5
+      end
+      table.remove(powerUps, i)
+    elseif powerUp.y > love.graphics.getHeight() then
+      table.remove(powerUps, i)
+    end
+
+  end
+end
+
 -- run our collision detection
 -- Since there will be fewer enemies on screen than bullets we'll loop them first
 -- Also, we need to see if the enemies hit our player
@@ -201,7 +240,22 @@ function gameCollisionWithEnemy(dt)
           local deadEnemy = {x = enemy.x, y = enemy.y, enemyDyingTimer = enemyDyingTimer, enemyDyingTimeInterval = enemyDyingTimeInterval, explScale = explScale}
 
           table.insert(deadEnemies, deadEnemy)
+
+          --removes enemy with a chance to spawn power up
           table.remove(enemies, i)
+
+          if powerUpCount > 0 then
+            local randomNumber = math.random()*100
+            if powerUpSpawnChance > randomNumber then
+              local num = math.random()*100
+              local num2 = math.ceil(num/(100/#powerUpTypes))
+              local type = powerUpTypes[num2]
+
+              local newPowerUp = powerUpSpawn(deadEnemy.x, deadEnemy.y, type)
+              table.insert(powerUps, newPowerUp)
+            end
+            powerUpCount = powerUpCount - 1
+          end
 
           score = score + 1
           local explosionSoundClone = explosionSound:clone()
@@ -218,20 +272,31 @@ function gameCollisionWithEnemy(dt)
     and isAlive then
       local enemyDmg = enemy.damage
 
-      --resolving shields first
-      if player.shield > 0 then
-        if player.shield >= enemyDmg then
-          player.shield = player.shield - enemyDmg
-          enemyDmg = 0
-        else
-          enemyDmg = enemyDmg - player.shield
-          player.shield = 0
+      -- when player isn't invincible
+      if (powerUpInvincTimer <= 0) then
+
+        --resolving shields first
+        if player.shield > 0 then
+          if player.shield >= enemyDmg then
+            player.shield = player.shield - enemyDmg
+            enemyDmg = 0
+          else
+            enemyDmg = enemyDmg - player.shield
+            player.shield = 0
+          end
         end
+
+        --resolving hp
+        player.hp = player.hp - enemyDmg
+
+        if powerUpShieldTimer > 0 then
+          player.shieldTimerRegen = shieldTimerRegenPoweredUp
+        else
+          player.shieldTimerRegen = shieldTimerRegenDefault
+        end
+
       end
 
-      --resolving hp
-      player.hp = player.hp - enemyDmg
-      player.shieldTimerRegen = shieldTimerRegenDefault
       local hitSoundClone = hitSound:clone()
       hitSoundClone:play()
 
@@ -268,20 +333,31 @@ function gameCollisionWithBullets(dt)
 
       local bulletDmg = bullet.damage
 
-      --resolving shields first
-      if player.shield > 0 then
-        if player.shield >= bulletDmg then
-          player.shield = player.shield - bulletDmg
-          bulletDmg = 0
-        else
-          bulletDmg = bulletDmg - player.shield
-          player.shield = 0
+      -- when player isn't invincible
+      if (powerUpInvincTimer <= 0) then
+
+        --resolving shields first
+        if player.shield > 0 then
+          if player.shield >= bulletDmg then
+            player.shield = player.shield - bulletDmg
+            bulletDmg = 0
+          else
+            bulletDmg = bulletDmg - player.shield
+            player.shield = 0
+          end
         end
+
+        --resolving hp
+        player.hp = player.hp - bulletDmg
+
+        if powerUpShieldTimer > 0 then
+          player.shieldTimerRegen = shieldTimerRegenPoweredUp
+        else
+          player.shieldTimerRegen = shieldTimerRegenDefault
+        end
+
       end
 
-      --resolving hp
-      player.hp = player.hp - bulletDmg
-      player.shieldTimerRegen = shieldTimerRegenDefault
       local hitSoundClone = hitSound:clone()
       hitSoundClone:play()
 
@@ -368,15 +444,32 @@ end
 -- shield regeneration
 function gameShieldRegen(dt)
   if isAlive then
-    player.shieldTimerRegen = player.shieldTimerRegen - 1*dt
 
-    if player.shieldTimerRegen <= 0 then
-      if(player.shield < playerShieldDefault) then
-        player.shield = player.shield + player.shieldRegenMult*dt
-        if(player.shield > playerShieldDefault)then
-          player.shield = playerShieldDefault
+    if powerUpShieldTimer > 0 then
+
+      player.shieldTimerRegen = player.shieldTimerRegen - 1*dt
+
+      if player.shieldTimerRegen <= 0 then
+        if(player.shield < playerShieldDefault) then
+          player.shield = player.shield + shieldRegenMultPoweredUp*dt
+          if(player.shield > playerShieldDefault)then
+            player.shield = playerShieldDefault
+          end
         end
       end
+
+    else
+      player.shieldTimerRegen = player.shieldTimerRegen - 1*dt
+
+      if player.shieldTimerRegen <= 0 then
+        if(player.shield < playerShieldDefault) then
+          player.shield = player.shield + player.shieldRegenMult*dt
+          if(player.shield > playerShieldDefault)then
+            player.shield = playerShieldDefault
+          end
+        end
+      end
+
     end
   end
 end
@@ -404,6 +497,8 @@ function resetVariables()
   canShootTimer = canShootTimerMax
   playerDyingTimer = playerDyingTimerDefault
   dyingTimeInterval = playerDyingTimer/table.getn(playerExplostionImgs)
+  powerUpShieldTimer = 0
+  powerUpInvincTimer = 0
 
   -- move player back to default position
   player.x = love.graphics.getWidth()/2

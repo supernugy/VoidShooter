@@ -36,6 +36,9 @@ function love.load(arg)
   explosionSound = love.audio.newSource('assets/sounds/explosion.wav')
   shootSound = love.audio.newSource('assets/sounds/playerShoot.wav','static')
 
+  powerUpShieldImg = love.graphics.newImage('assets/powerup/circle_star_icon_blue.png')
+  powerUpInvinvImg = love.graphics.newImage('assets/powerup/circle_star_icon_yellow.png')
+
   table.insert(playerExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_06_0008.png'))
   table.insert(playerExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_06_0012.png'))
   table.insert(playerExplostionImgs, love.graphics.newImage('assets/effects/explosion/expl_06_0015.png'))
@@ -56,6 +59,9 @@ function love.load(arg)
   --setting up level timers
   endLevelTimer = 3
   beginLevelTimer = 3
+
+  math.randomseed(os.time())
+  math.random(); math.random(); math.random()
 
   --creating buttons
   menuButtonSpawn(love.graphics.getWidth()/2, 200, "Start", "start")
@@ -79,6 +85,7 @@ function love.update(dt)
     gameCollisionWithEnemy(dt)
     gameCollisionWithBullets(dt)
     gameShieldRegen(dt)
+    gameUpdatePowerUps(dt)
     gameReset()
   elseif gamestate == "menu" then
     mouseX = love.mouse.getX()
@@ -108,7 +115,7 @@ end
 function love.draw(dt)
 
   if gamestate == "ingame" or gamestate == "pause" then
-    love.graphics.print("FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+    --love.graphics.print("FPS: "..tostring(love.timer.getFPS( )), 10, 10)
 
     love.graphics.print("Score:"..score, 10, love.graphics:getHeight()-30)
 
@@ -147,6 +154,24 @@ function love.draw(dt)
     for i, bullet in ipairs(enemyBullets) do
       love.graphics.draw(bullet.img, bullet.x, bullet.y)
     end
+
+    --drawing power ups
+    for i, powerUp in ipairs(powerUps) do
+      love.graphics.draw(powerUp.img, powerUp.x, powerUp.y)
+    end
+
+    if powerUpShieldTimer > 0 then
+      love.graphics.draw(powerUpShieldImg, 0, 0)
+      local intTimer = math.ceil(powerUpShieldTimer)
+      love.graphics.print(intTimer, 0, 45)
+    end
+
+    if powerUpInvincTimer > 0 then
+      love.graphics.draw(powerUpInvinvImg, 45, 0)
+      local intTimer = math.ceil(powerUpInvincTimer)
+      love.graphics.print(intTimer, 45, 45)
+    end
+
 
     --drawing enemies
     for i, enemy in ipairs(enemies) do

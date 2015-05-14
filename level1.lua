@@ -22,6 +22,7 @@ function level1Start()
   local spawnArrayX = {20,450,50,400,100,350,150,300,200,250}
   local spawnArrayTimers = {2,0.1,4,0.1,4,0.1,4,0.1,4,0.1}
   spawnIndex = 1
+  powerUpCount = 2
 
   spawnPoints = gameGenerateSpawnPoints(spawnArrayX, spawnArrayTimers)
   if table.getn(spawnPoints) < numberOfEnemies then
